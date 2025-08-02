@@ -12,7 +12,9 @@ public class TestController {
 
     @GetMapping("/hello")
     public String hello() {
-        log.info("request received at /test/hello");
-        return "Hello, World!";
+        log.info("GET /test/hello - Request received");
+        String response = "Hello, World!";
+        log.info("GET /test/hello - Response sent: {}", response);
+        return response;
     }
 }
