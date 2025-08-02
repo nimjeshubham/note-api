@@ -6,6 +6,7 @@ import com.example.demo.service.NoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 public class NotesController {
 
     private final NoteService noteService;
+
 
     @GetMapping
     public ResponseEntity<Flux<Note>> getAllNotes(@AuthenticationPrincipal UserDetails userDetails) {
