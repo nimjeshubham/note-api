@@ -16,7 +16,7 @@ public record UserDetails(
 
         @NotNull
         @Schema(description = "User role", example = "Admin")
-        String userRole,
+        AppRole userRole,
 
         @Schema(description = "User active status", example = "true")
         String active
