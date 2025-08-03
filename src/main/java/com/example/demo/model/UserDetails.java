@@ -11,12 +11,15 @@ public record UserDetails(
         String name,
 
         @NotNull
-        @Schema(description = "User password", example = "password123")
+        @Schema(description = "User password", example = "[HIDDEN]", accessMode = Schema.AccessMode.WRITE_ONLY)
         String password,
 
         @NotNull
         @Schema(description = "User role", example = "Admin")
-        String userRole
+        String userRole,
+
+        @Schema(description = "User active status", example = "true")
+        String active
 
 ) {
 }

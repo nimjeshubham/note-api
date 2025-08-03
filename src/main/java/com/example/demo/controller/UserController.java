@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.UserDetails;
+import com.example.demo.model.*;
 import com.example.demo.service.UserService;
+import com.example.demo.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +22,14 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
+
+    private ResponseEntity<?> validateAuth(AuthRequest auth) {
+        if (authService.validateUser(auth.username(), auth.password())) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+        return null;
+    }
 
     @PostMapping
     @Operation(summary = "Create a new user", description = "Creates a new user with the provided details")
@@ -41,8 +50,12 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User found"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<UserDetails> getUser(
-            @Parameter(description = "Name of the user to retrieve") @PathVariable String name) {
+    public ResponseEntity<?> getUser(
+            @Parameter(description = "Name of the user to retrieve") @PathVariable String name,
+            @RequestBody AuthRequest auth) {
+        ResponseEntity<?> authError = validateAuth(auth);
+        if (authError != null) return authError;
+        
         log.info("GET /api/v1/user/{} - Retrieving user", name);
         return userService.getUserByName(name)
                 .map(user -> {
@@ -58,7 +71,10 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get all users", description = "Retrieves a list of all users")
     @ApiResponse(responseCode = "200", description = "List of users retrieved successfully")
-    public ResponseEntity<List<UserDetails>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestBody AuthRequest auth) {
+        ResponseEntity<?> authError = validateAuth(auth);
+        if (authError != null) return authError;
+        
         log.info("GET /api/v1/user - Retrieving all users");
         List<UserDetails> users = userService.getAllUsers();
         log.info("GET /api/v1/user - Retrieved {} users", users.size());
@@ -71,15 +87,18 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User updated successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<UserDetails> updateUser(
+    public ResponseEntity<?> updateUser(
             @Parameter(description = "Name of the user to update") @PathVariable String name, 
-            @RequestBody UserDetails user) {
+            @RequestBody UpdateUserRequest request) {
+        ResponseEntity<?> authError = validateAuth(request.auth());
+        if (authError != null) return authError;
+        
         log.info("PUT /api/v1/user/{} - Updating user", name);
         if (!userService.getUserByName(name).isPresent()) {
             log.warn("PUT /api/v1/user/{} - User not found for update", name);
             return ResponseEntity.notFound().build();
         }
-        UserDetails updatedUser = userService.updateUser(name, user);
+        UserDetails updatedUser = userService.updateUser(name, request.user());
         log.info("PUT /api/v1/user/{} - User updated successfully", name);
         return ResponseEntity.ok(updatedUser);
     }
@@ -90,8 +109,12 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<Void> deleteUser(
-            @Parameter(description = "Name of the user to delete") @PathVariable String name) {
+    public ResponseEntity<?> deleteUser(
+            @Parameter(description = "Name of the user to delete") @PathVariable String name,
+            @RequestBody AuthRequest auth) {
+        ResponseEntity<?> authError = validateAuth(auth);
+        if (authError != null) return authError;
+        
         log.info("DELETE /api/v1/user/{} - Deleting user", name);
         boolean deleted = userService.deleteUser(name);
         if (deleted) {
