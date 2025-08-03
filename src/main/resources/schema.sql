@@ -1,16 +1,18 @@
 CREATE TABLE IF NOT EXISTS note (
     note_id SERIAL PRIMARY KEY,
-    title VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
     content TEXT,
-    created_at VARCHAR(50),
-    updated_at VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     owner_name VARCHAR(255),
     owner_email VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
     id SERIAL PRIMARY KEY,
-    user_name VARCHAR(255) NOT NULL,
-    user_password VARCHAR(255) NOT NULL,
-    user_role VARCHAR(255) NOT NULL
+    name VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    user_role VARCHAR(20) NOT NULL,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

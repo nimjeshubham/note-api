@@ -1,15 +1,18 @@
 package com.example.demo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "Authentication request")
 public record AuthRequest(
-        @NotNull
+        @NotBlank
+        @Size(min = 3, max = 50)
         @Schema(description = "Username", example = "admin")
         String username,
         
-        @NotNull
+        @NotBlank
+        @Size(min = 8, max = 100)
         @Schema(description = "Password", example = "[HIDDEN]", accessMode = Schema.AccessMode.WRITE_ONLY)
         String password
 ) {

@@ -30,7 +30,7 @@ public class NotesController {
     private final AuthService authService;
 
     private ResponseEntity<?> validateAuth(AuthRequest auth) {
-        if (authService.validateUser(auth.username(), auth.password())) {
+        if (!authService.validateUser(auth.username(), auth.password())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
         return null;

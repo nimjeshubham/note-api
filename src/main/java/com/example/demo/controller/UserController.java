@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -25,8 +27,8 @@ public class UserController {
     private final AuthService authService;
 
     private ResponseEntity<?> validateAuth(AuthRequest auth) {
-        if (authService.validateUser(auth.username(), auth.password())) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+        if (!authService.validateUser(auth.username(), auth.password())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
         return null;
     }
@@ -37,7 +39,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user data")
     })
-    public ResponseEntity<UserDetails> createUser(@RequestBody UserDetails user) {
+    public ResponseEntity<UserDetails> createUser(@Valid @RequestBody UserDetails user) {
         log.info("POST /api/v1/user - Creating user: {}", user.name());
         UserDetails createdUser = userService.createUser(user);
         log.info("POST /api/v1/user - User created successfully: {}", createdUser.name());
@@ -52,7 +54,7 @@ public class UserController {
     })
     public ResponseEntity<?> getUser(
             @Parameter(description = "Name of the user to retrieve") @PathVariable String name,
-            @RequestBody AuthRequest auth) {
+            @Valid @RequestBody AuthRequest auth) {
         ResponseEntity<?> authError = validateAuth(auth);
         if (authError != null) return authError;
         
@@ -71,7 +73,7 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get all users", description = "Retrieves a list of all users")
     @ApiResponse(responseCode = "200", description = "List of users retrieved successfully")
-    public ResponseEntity<?> getAllUsers(@RequestBody AuthRequest auth) {
+    public ResponseEntity<?> getAllUsers(@Valid @RequestBody AuthRequest auth) {
         ResponseEntity<?> authError = validateAuth(auth);
         if (authError != null) return authError;
         
@@ -89,7 +91,7 @@ public class UserController {
     })
     public ResponseEntity<?> updateUser(
             @Parameter(description = "Name of the user to update") @PathVariable String name, 
-            @RequestBody UpdateUserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request) {
         ResponseEntity<?> authError = validateAuth(request.auth());
         if (authError != null) return authError;
         
@@ -111,7 +113,7 @@ public class UserController {
     })
     public ResponseEntity<?> deleteUser(
             @Parameter(description = "Name of the user to delete") @PathVariable String name,
-            @RequestBody AuthRequest auth) {
+            @Valid @RequestBody AuthRequest auth) {
         ResponseEntity<?> authError = validateAuth(auth);
         if (authError != null) return authError;
         
