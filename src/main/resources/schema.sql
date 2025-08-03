@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS note (
 
 CREATE TABLE IF NOT EXISTS user_details (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL
+    user_name VARCHAR(255) NOT NULL,
+    user_password VARCHAR(255) NOT NULL,
+    user_role VARCHAR(255) NOT NULL
 );

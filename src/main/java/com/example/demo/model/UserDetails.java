@@ -12,6 +12,11 @@ public record UserDetails(
 
         @NotNull
         @Schema(description = "User password", example = "password123")
-        String password
+        String password,
+
+        @NotNull
+        @Schema(description = "User role", example = "Admin")
+        String userRole
+
 ) {
 }
